@@ -18,7 +18,7 @@ namespace PCO.Models
             _context.SaveChanges();
         }
 
-        public void Delete(int id)
+        public void Delete(int? id)
         {
             var place = _context.Places.Find(id);
             _context.Places.Remove(place);
@@ -30,7 +30,7 @@ namespace PCO.Models
             return _context.Places.ToList();
         }
 
-        public Place Get(int id)
+        public Place Get(int? id)
         {
             return _context.Places.Single(p => p.Id == id);
         }

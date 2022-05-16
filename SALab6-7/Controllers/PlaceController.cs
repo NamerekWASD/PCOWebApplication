@@ -36,9 +36,9 @@ namespace PCO.Controllers
         {
             return View(CreatePlaceCategoryViewModel(placeCategory, searchString));
         }
-        public async Task<IActionResult> PlaceDetails(int? id, string Comment, IFormFile uploadedFile)
+        public IActionResult PlaceDetails(int? id, string Comment, IFormFile uploadedFile)
         {
-            var placeModel = await GetPlaceAsync(id);
+            var placeModel = Get(id);
 
             if (placeModel == null)
             {
@@ -121,9 +121,9 @@ namespace PCO.Controllers
             return View(placeModel);
         }
         [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> Details(int? id)
+        public IActionResult Details(int? id)
         {
-            var placeModel = await GetPlaceAsync(id);
+            var placeModel = Get(id);
             if (placeModel == null)
             {
                 return NotFound();
@@ -150,7 +150,7 @@ namespace PCO.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Category,Country,City")] Place placeModel)
+        public IActionResult Edit(int id, [Bind("Id,Name,Category,Country,City")] Place placeModel)
         {
             if (id != placeModel.Id)
             {
@@ -161,7 +161,7 @@ namespace PCO.Controllers
             {
                 try
                 {
-                    var requestedPlace = await _context.Places.FindAsync(id);
+                    var requestedPlace = PlaceRepository.Get(id);
                     var editedPlace = new RequestedPlace()
                     {
                         Name = placeModel.Name,
@@ -179,7 +179,7 @@ namespace PCO.Controllers
                         Place = requestedPlace,
                         RequestedPlace = editedPlace
                     });
-                    await _context.SaveChangesAsync();
+                    _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -198,15 +198,14 @@ namespace PCO.Controllers
         }
 
         [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> Delete(int? id)
+        public IActionResult Delete(int? id)
         {
             if (id == null || _context.Places == null)
             {
                 return NotFound();
             }
 
-            var placeModel = await _context.Places
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var placeModel = PlaceRepository.Get(id);
             if (placeModel == null)
             {
                 return NotFound();
@@ -218,16 +217,16 @@ namespace PCO.Controllers
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public IActionResult DeleteConfirmed(int id)
         {
 
-            var placeModel = await GetPlaceAsync(id);
+            var placeModel = Get(id);
             if (placeModel == null)
             {
                 return NotFound();
             }
             _context.Add(new RequestStore{ UserWhoAddedRequest = User.Identity.Name, Place = placeModel, IsDeleted = true });
-            await _context.SaveChangesAsync();
+            _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
@@ -235,13 +234,13 @@ namespace PCO.Controllers
         {
           return (_context.Places?.Any(e => e.Id == id)).GetValueOrDefault();
         }
-        private async Task<Place> GetPlaceAsync(int? id)
+        private Place Get(int? id)
         {
             if(id == null || _context.Places == null)
             {
                 return null;
             }
-            var placeModel = await _context.Places.FirstOrDefaultAsync(e => e.Id == id);
+            var placeModel = PlaceRepository.Get(id);
             if (placeModel==null)
             {
                 return null;
