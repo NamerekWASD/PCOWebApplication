@@ -1,0 +1,69 @@
+﻿@model PCO.Models.PlaceModels.PlaceCategoryViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+<style>
+    * {
+  box-sizing: border-box;
+}
+
+#searchinput {
+  width: 100%;
+  font-size: 16px;
+  padding: 12px 20px 12px 40px;
+  margin-left:3%;
+  border: 1px solid #ddd;
+  margin-bottom: 12px;
+}
+</style>
+
+<form asp-controller="Place" asp-action="List" method="get">
+    <div style="display:flex">
+        <select asp-for="PlaceCategory" asp-items="Model.Categories" class="select-place-filter">
+            <option value="">All</option>
+        </select>
+        <input type="text" asp-for="SearchString" id="searchinput"/> 
+        <input type="submit" value="Filter" class="btn"/>
+    </div>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Places[0].Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Places[0].Category)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Places[0].Country)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Places[0].City)
+            </th>
+        </tr>
+    </thead>
+<tbody>
+@foreach (var item in Model.Places) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <th>
+                @Html.DisplayFor(modelItem => item.Category)
+            </th>
+            <td>
+                @Html.DisplayFor(modelItem => item.Country)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.City)
+            </td>
+            <td>
+                | <a asp-controller="Place" asp-action="PlaceDetails" asp-route-id="@item.Id">Details</a> |
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
